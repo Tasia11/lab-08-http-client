@@ -21,76 +21,37 @@ HunterGate(
 )
 
 # TODO: rename project and delete this comment
-project(template)
+project(client)
 string(APPEND CMAKE_CXX_FLAGS " -pedantic -Werror -Wall -Wextra")
 string(APPEND CMAKE_CXX_FLAGS " -Wno-unused-command-line-argument")
 string(APPEND CMAKE_CXX_FLAGS " -Wshadow -Wnon-virtual-dtor")
 
+hunter_add_package(Boost COMPONENTS thread filesystem)
+find_package(Boost CONFIG REQUIRED thread filesystem)
+
+find_package(Threads)
 hunter_add_package(GTest)
 find_package(GTest CONFIG REQUIRED)
 
-hunter_add_package(Boost COMPONENTS system)
-find_package(Boost CONFIG REQUIRED system)
-
-hunter_add_package(Beast)
-find_package(Beast CONFIG REQUIRED)
-
 # TODO: change template word to project name and delete this comment
-add_library(template STATIC
-  # enum your files and delete this comment
-  ${CMAKE_CURRENT_SOURCE_DIR}/sources/main.cpp
-        sources/source.cpp
-        include/header.hpp)
+
 add_executable(tests
-  # TODO: enum your files and delete this comment
-  ${CMAKE_CURRENT_SOURCE_DIR}/tests/test.cpp
-        sources/source.cpp
-        include/header.hpp)
-add_executable(main
-        ${CMAKE_CURRENT_SOURCE_DIR}/sources/main.cpp
-        sources/source.cpp
-        include/header.hpp)
+        # TODO: enum your files and delete this comment
+        ${CMAKE_CURRENT_SOURCE_DIR}/sources/Client.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/sources/Url.cpp
+        #${CMAKE_CURRENT_SOURCE_DIR}/sources/source.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/tests/test.cpp
+        )
 
-# TODO: change template word to project name and delete this comment
-target_include_directories(template
-  PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
-)
 target_include_directories(tests
-  PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
-)
-target_include_directories(main
         PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
         )
 # TODO: change template word to project name and delete this comment
-target_link_libraries(template
-        GTest::gtest_main
-        Beast::Beast
-        Boost::system)
 target_link_libraries(tests
-        Beast::Beast
-        Boost::system
+        Boost::filesystem
+        Boost::thread
         GTest::gtest_main
-        template)
-target_link_libraries(main
-        Beast::Beast
-        Boost::system
-        template)
+        )
+
 enable_testing()
 add_test(NAME unit_tests COMMAND tests)
-
-if(BUILD_COVERAGE)
-  function(ENABLE_PROJECT_COVERAGE PROJECT)
-    target_compile_options(${PROJECT} PRIVATE --coverage)
-    target_link_libraries(${PROJECT} --coverage)
-    add_coverage(${PROJECT})
-  endfunction()
-
-  set(ENABLE_COVERAGE ON CACHE BOOL "Enable coverage build." FORCE)
-  list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-  find_package(codecov)
-  # TODO: change template word to project name and delete this comment
-  enable_project_coverage(template)
-  enable_project_coverage(tests)
-  list(APPEND LCOV_REMOVE_PATTERNS "'${PROJECT_SOURCE_DIR}/tests/*'")
-  coverage_evaluate()
-endif()
